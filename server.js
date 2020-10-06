@@ -94,7 +94,9 @@ function viewDept() {
 }
 function addEmployee() {
     //I think role array needs to go here so employee can connect w/ role id
+    // and connect to dept table
     //Maybe employees array too so employees can connect if manager needs to be related?
+    // and connect to employee db...twice?
     inquirer.prompt([
     {
         type: "input",
@@ -139,32 +141,45 @@ function viewEmployees() {
 }
  function addRole() {
      //I think department array needs to go here so role can connect w/ dept id
-     let departments = [];
-     inquirer.prompt([
-        {
-            type: "input",
-            message: "Enter role title",
-            name: "roleTitle"
-        },
-        {
-            type: "input",
-            message: "Enter this role's salary",
-            name: "salary"
-        },
-        {
-            type: "input",
-            message: "Enter the department ID for this role",
-            name: "departmentID"
-        }
+     //and connect to dept db
+    let departmentsArray = [];
+    let query = "SELECT * FROM department";
+    connection.query(query, (err, res) => {
+        if (err)
+            throw err;
+        //LEFT OFF HERE
+        departmentsArray = res.map(({ id, name}) => ({
+            name: name,
+            value: id
+        }))
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "Enter role title",
+                name: "roleTitle"
+            },
+            {
+                type: "input",
+                message: "Enter this role's salary",
+                name: "salary"
+            },
+            {
+                type: "list",
+                message: "Select the department ID for this role",
+                name: "departmentID",
+                choices: departmentsArray
+            }
         ]).then((answer) => {
-            connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${answer.departmentID});`, (err, res) => {
-                if(err) 
-                    throw err;
-                console.log((`Role ${answer.roleTitle} added!`));
-                askQuestions();
-            });
+                connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${answer.departmentID});`, (err, res) => {
+                    if(err) 
+                        throw err;
+                    console.log((`Role ${answer.roleTitle} added!`));
+                    askQuestions();
+                });
     
-        })
+    
+            })        
+    })
 }
 function viewRoles() {
     //console.log("viewing role")

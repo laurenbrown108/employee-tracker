@@ -36,8 +36,7 @@ function askQuestions() {
         ]),
         name: "choice"
     }).then(answer => {
-        //console.log(answer.choice)
-        switch(answer.choice) {
+        switch (answer.choice) {
             case "Add department":
                 addDept();
                 break;
@@ -61,7 +60,7 @@ function askQuestions() {
                 break;
             default:
                 none();
-            
+
         }
     })
 }
@@ -73,20 +72,20 @@ function addDept() {
         name: "deptName"
     }).then((answer) => {
         connection.query(`INSERT INTO department (name) VALUES ("${answer.deptName}");`, (err, res) => {
-            if(err) 
+            if (err)
                 throw err;
             console.log((`\n"${answer.deptName}" department added!\n`));
             askQuestions();
         });
     })
-    
+
 }
 function viewDept() {
     //console.log("viewing dept")
     let query = "SELECT * FROM department";
     connection.query(query, (err, res) => {
         if (err)
-        throw err;
+            throw err;
         console.log(`\nDisplaying Departments...\n`)
         console.table(res);
         askQuestions();
@@ -94,42 +93,42 @@ function viewDept() {
 }
 function addEmployee() {
     //Maybe employees array too so employees can connect if manager needs to be related?
-    // and connect to employee db...twice?
+    // maybe a join? to get info from role and employee db? 
     let roleArray = [];
     let query = "SELECT * FROM role";
     connection.query(query, (err, res) => {
         if (err)
             throw err;
 
-        roleArray = res.map(({ title, id}) => ({
+        roleArray = res.map(({ title, id }) => ({
             name: title,
             value: id
         }))
         inquirer.prompt([
-        {
-            type: "input",
-            message: "Enter employee's first name",
-            name: "firstName"
-        },
-        {
-            type: "input",
-            message: "Enter employee's last name",
-            name: "lastName"
-        },
-        {
-            type: "list",
-            message: "Select employee's role",
-            choices: roleArray,
-            name: "roleID"
-        },
-        {
-            type: "input",
-            message: "Enter the ID of the employee's manager if applicable",
-            name: "managerID"
-        }
+            {
+                type: "input",
+                message: "Enter employee's first name",
+                name: "firstName"
+            },
+            {
+                type: "input",
+                message: "Enter employee's last name",
+                name: "lastName"
+            },
+            {
+                type: "list",
+                message: "Select employee's role",
+                choices: roleArray,
+                name: "roleID"
+            },
+            {
+                type: "input",
+                message: "Enter the ID of the employee's manager if applicable",
+                name: "managerID"
+            }
         ]).then((answer) => {
             connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.roleID}, ${answer.managerID});`, (err, res) => {
-                if(err) 
+                if (err)
                     throw err;
                 console.log((`\n Employee ${answer.firstName} ${answer.lastName} added! \n`));
                 askQuestions();
@@ -143,22 +142,20 @@ function viewEmployees() {
     let query = "SELECT * FROM employee";
     connection.query(query, (err, res) => {
         if (err)
-        throw err;
+            throw err;
         console.log(`\nDisplaying Employees...\n`)
         console.table(res);
         askQuestions();
     })
 }
- function addRole() {
-     //I think department array needs to go here so role can connect w/ dept id
-     //and connect to dept db
+function addRole() {
     let departmentsArray = [];
     let query = "SELECT * FROM department";
     connection.query(query, (err, res) => {
         if (err)
             throw err;
 
-        departmentsArray = res.map(({ name, id}) => ({
+        departmentsArray = res.map(({ name, id }) => ({
             name: name,
             value: id
         }))
@@ -180,15 +177,15 @@ function viewEmployees() {
                 choices: departmentsArray
             }
         ]).then((answer) => {
-                connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${answer.departmentID});`, (err, res) => {
-                    if(err) 
-                        throw err;
-                    console.log((`Role ${answer.roleTitle} added!`));
-                    askQuestions();
-                });
-    
-    
-            })        
+            connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${answer.departmentID});`, (err, res) => {
+                if (err)
+                    throw err;
+                console.log((`Role ${answer.roleTitle} added!`));
+                askQuestions();
+            });
+
+
+        })
     })
 }
 function viewRoles() {
@@ -196,17 +193,57 @@ function viewRoles() {
     let query = "SELECT * FROM role";
     connection.query(query, (err, res) => {
         if (err)
-        throw err;
+            throw err;
         console.log(`\nDisplaying Roles...\n`)
         console.table(res);
         askQuestions();
     })
 
 }
-// function updateRole() {
-//     console.log("role updated")
-// }
- function none() {
-     console.log(`\nQuitting\n`)
-     connection.end();
+function updateRole() {
+    let query = "SELECT * FROM employee";
+    connection.query(query, (err, res) => {
+        if (err)
+            throw err;
+        const allEmployees = res.map(({ first_name, last_name, id }) => ({
+            name: first_name + " " + last_name,
+            value: id
+        }))
+        let query = "SELECT * FROM role";
+        connection.query(query, (err, res) => {
+            if (err)
+                throw err;
+            const allRoles = res.map(({ title, id }) => ({
+                name: title,
+                value: id
+            }))
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select an employee to update their role",
+                    name: "updatedEmployee",
+                    choices: allEmployees
+                },
+                { 
+                    type: "list",
+                    message: "Select a new role for this employee",
+                    name: "updatedRole",
+                    choices: allRoles
+                }
+            ]).then((answer) => {
+                connection.query(`UPDATE employee set role_id="${answer.updatedRole}"  where id="${answer.updatedEmployee}"`, (err, res => {
+                    if (err)
+                        throw err;
+                console.log((`Role updated!`));
+                askQuestions();
+                }))
+            })
+        
+        })
+    })
+}
+function none() {
+    console.log(`\nQuitting\n`)
+    connection.end();
 }

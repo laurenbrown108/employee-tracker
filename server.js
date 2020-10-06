@@ -36,7 +36,7 @@ function askQuestions() {
         ]),
         name: "choice"
     }).then(answer => {
-        console.log(answer.choice)
+        //console.log(answer.choice)
         switch(answer.choice) {
             case "Add department":
                 addDept();
@@ -93,7 +93,8 @@ function viewDept() {
     })
 }
 function addEmployee() {
-    //console.log("\n employee added \n")
+    //I think role array needs to go here so employee can connect w/ role id
+    //Maybe employees array too so employees can connect if manager needs to be related?
     inquirer.prompt([
     {
         type: "input",
@@ -137,7 +138,8 @@ function viewEmployees() {
     })
 }
  function addRole() {
-     console.log("role added")
+     //I think department array needs to go here so role can connect w/ dept id
+     let departments = [];
      inquirer.prompt([
         {
             type: "input",
@@ -180,6 +182,6 @@ function viewRoles() {
 //     console.log("role updated")
 // }
  function none() {
-     console.log("quitting")
+     console.log(`\nQuitting\n`)
      connection.end();
 }

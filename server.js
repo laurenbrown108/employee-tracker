@@ -13,7 +13,7 @@ const connection = mysql.createConnection({
     database: "employeetrackerDB"
 });
 
-connection.connect(function (err) {
+connection.connect((err) => {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     askQuestions();

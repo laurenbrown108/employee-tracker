@@ -75,17 +75,25 @@ function addDept() {
         connection.query(`INSERT INTO department (name) VALUES ("${answer.deptName}");`, (err, res) => {
             if(err) 
                 throw err;
-            console.log((`"${answer.deptName}" department added!`));
+            console.log((`\n"${answer.deptName}" department added!\n`));
             askQuestions();
         });
     })
     
 }
 function viewDept() {
-    console.log("viewing dept")
+    //console.log("viewing dept")
+    let query = "SELECT * FROM department";
+    connection.query(query, (err, res) => {
+        if (err)
+        throw err;
+        console.log(`\nDisplaying Departments...\n`)
+        console.table(res);
+        askQuestions();
+    })
 }
 function addEmployee() {
-    //console.log("employee added")
+    //console.log("\n employee added \n")
     inquirer.prompt([
     {
         type: "input",
@@ -111,15 +119,23 @@ function addEmployee() {
         connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.roleID}, ${answer.managerID});`, (err, res) => {
             if(err) 
                 throw err;
-            console.log((`Employee ${answer.firstName} ${answer.lastName} added!`));
+            console.log((`\n Employee ${answer.firstName} ${answer.lastName} added! \n`));
             askQuestions();
         });
 
     })
 }
-// function viewEmployees() {
-//     console.log("viewing employee")
-// }
+function viewEmployees() {
+    //console.log("viewing employee")
+    let query = "SELECT * FROM employee";
+    connection.query(query, (err, res) => {
+        if (err)
+        throw err;
+        console.log(`\nDisplaying Employees...\n`)
+        console.table(res);
+        askQuestions();
+    })
+}
  function addRole() {
      console.log("role added")
      inquirer.prompt([
@@ -148,9 +164,18 @@ function addEmployee() {
     
         })
 }
-// function viewRoles() {
-//     console.log("viewing role")
-// }
+function viewRoles() {
+    //console.log("viewing role")
+    let query = "SELECT * FROM role";
+    connection.query(query, (err, res) => {
+        if (err)
+        throw err;
+        console.log(`\nDisplaying Roles...\n`)
+        console.table(res);
+        askQuestions();
+    })
+
+}
 // function updateRole() {
 //     console.log("role updated")
 // }

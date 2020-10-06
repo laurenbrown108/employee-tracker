@@ -93,39 +93,49 @@ function viewDept() {
     })
 }
 function addEmployee() {
-    //I think role array needs to go here so employee can connect w/ role id
-    // and connect to dept table
     //Maybe employees array too so employees can connect if manager needs to be related?
     // and connect to employee db...twice?
-    inquirer.prompt([
-    {
-        type: "input",
-        message: "Enter employee's first name",
-        name: "firstName"
-    },
-    {
-        type: "input",
-        message: "Enter employee's last name",
-        name: "lastName"
-    },
-    {
-        type: "input",
-        message: "Enter employee's ID",
-        name: "roleID"
-    },
-    {
-        type: "input",
-        message: "Enter the ID of the employee's manager if applicable",
-        name: "managerID"
-    }
-    ]).then((answer) => {
-        connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.roleID}, ${answer.managerID});`, (err, res) => {
-            if(err) 
-                throw err;
-            console.log((`\n Employee ${answer.firstName} ${answer.lastName} added! \n`));
-            askQuestions();
-        });
+    let roleArray = [];
+    let query = "SELECT * FROM role";
+    connection.query(query, (err, res) => {
+        if (err)
+            throw err;
 
+        roleArray = res.map(({ title, id}) => ({
+            name: title,
+            value: id
+        }))
+        inquirer.prompt([
+        {
+            type: "input",
+            message: "Enter employee's first name",
+            name: "firstName"
+        },
+        {
+            type: "input",
+            message: "Enter employee's last name",
+            name: "lastName"
+        },
+        {
+            type: "list",
+            message: "Select employee's role",
+            choices: roleArray,
+            name: "roleID"
+        },
+        {
+            type: "input",
+            message: "Enter the ID of the employee's manager if applicable",
+            name: "managerID"
+        }
+        ]).then((answer) => {
+            connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.roleID}, ${answer.managerID});`, (err, res) => {
+                if(err) 
+                    throw err;
+                console.log((`\n Employee ${answer.firstName} ${answer.lastName} added! \n`));
+                askQuestions();
+            });
+
+        })
     })
 }
 function viewEmployees() {
@@ -147,8 +157,8 @@ function viewEmployees() {
     connection.query(query, (err, res) => {
         if (err)
             throw err;
-        //LEFT OFF HERE
-        departmentsArray = res.map(({ id, name}) => ({
+
+        departmentsArray = res.map(({ name, id}) => ({
             name: name,
             value: id
         }))
@@ -165,7 +175,7 @@ function viewEmployees() {
             },
             {
                 type: "list",
-                message: "Select the department ID for this role",
+                message: "Select the department for this role",
                 name: "departmentID",
                 choices: departmentsArray
             }

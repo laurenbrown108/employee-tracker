@@ -15,7 +15,8 @@ const connection = mysql.createConnection({
 });
 
 connection.connect((err) => {
-    if (err) throw err;
+    if (err) 
+        throw err;
     console.log("connected as id " + connection.threadId);
     askQuestions();
 });
@@ -128,7 +129,7 @@ function addEmployee() {
                 },
                 {
                     type: "list",
-                    message: "If applicable, assign manager to this employee",
+                    message: "Assign manager to this employee",
                     choices: employees,
                     name: "managerID"
                 }
@@ -144,7 +145,7 @@ function addEmployee() {
     })
 }
 function viewEmployees() {
-    let query = "SELECT * FROM employee";
+    let query = "SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;";
     connection.query(query, (err, res) => {
         if (err)
             throw err;
@@ -154,13 +155,12 @@ function viewEmployees() {
     })
 }
 function addRole() {
-    let departmentsArray = [];
     let query = "SELECT * FROM department";
     connection.query(query, (err, res) => {
         if (err)
             throw err;
 
-        departmentsArray = res.map(({ name, id }) => ({
+        const departments = res.map(({ name, id }) => ({
             name: name,
             value: id
         }))
@@ -179,7 +179,7 @@ function addRole() {
                 type: "list",
                 message: "Select the department for this role",
                 name: "departmentID",
-                choices: departmentsArray
+                choices: departments
             }
         ]).then((answer) => {
             connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${answer.roleTitle}", ${answer.salary}, ${answer.departmentID});`, (err, res) => {

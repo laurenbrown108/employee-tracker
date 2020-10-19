@@ -10,7 +10,7 @@ Node JS, Javascript, MySQL
 
 ## Installation
 
-- Run the employeetracker.sql and seeds.sql in MySQL. Be sure to edit the information in the connection variblae in server.js before doing so.
+- Run the employeetracker.sql and seeds.sql in MySQL. Be sure to edit the information in the connection variable in server.js before doing so.
 - Run npm install to install the required dependencies.
 
 ![gif](https://github.com/laurenbrown108/employee-tracker/blob/main/assets/employeetrackergif.gif?raw=true)
